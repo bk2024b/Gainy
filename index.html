@@ -530,6 +530,73 @@
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
+      /* Tableau responsive */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    margin-bottom: 20px;
+}
+
+/* Masquer certaines colonnes sur les petits écrans */
+@media screen and (max-width: 768px) {
+    .table-responsive table th:nth-child(4),
+    .table-responsive table td:nth-child(4),
+    .table-responsive table th:nth-child(5),
+    .table-responsive table td:nth-child(5) {
+        display: none;
+    }
+}
+
+/* Mode carte pour les petits écrans */
+@media screen and (max-width: 600px) {
+    .table-responsive table {
+        display: block;
+        width: 100%;
+    }
+
+    .table-responsive thead {
+        display: none;
+    }
+
+    .table-responsive tbody {
+        display: block;
+    }
+
+    .table-responsive tr {
+        display: block;
+        margin-bottom: 15px;
+        border: 1px solid var(--medium-gray);
+        border-radius: var(--border-radius);
+        padding: 10px;
+        background-color: var(--white);
+        box-shadow: var(--shadow);
+    }
+
+    .table-responsive td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px;
+        border: none;
+    }
+
+    .table-responsive td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        margin-right: 10px;
+        color: var(--secondary-color);
+    }
+
+    .table-responsive td:last-child {
+        border-bottom: none;
+    }
+
+    .table-responsive .btn {
+        margin: 2px;
+        padding: 6px 10px;
+        font-size: 14px;
+    }
+}
     </style>
 </head>
 <body>
@@ -692,12 +759,12 @@
                         <table id="table-locataires">
                             <thead>
                                 <tr>
-                                    <th>Nom</th>
+                                    <th >Nom</th>
                                     <th>Prénom</th>
                                     <th>Téléphone</th>
                                     <th>Chambre</th>
                                     <th>Loyer</th>
-                                    <th>Actions</th>
+                                    <th>Actions </th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -854,11 +921,13 @@
                         <table id="table-depenses">
                             <thead>
                                 <tr>
-                                    <th>Date</th>
-                                    <th>Type</th>
-                                    <th>Montant</th>
+                                    <th >Date</th>
+                                    <th >Type</th>
+                                    <th >Montant</th>
                                     <th>Description</th>
-                                    <th>Actions</th>
+                                    <th >Actions
+                                      
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -1134,14 +1203,14 @@
                 if (chambre) {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td>${locataire.nom}</td>
-                        <td>${locataire.prenom}</td>
-                        <td>${locataire.telephone}</td>
-                        <td>${chambre.numero}</td>
-                        <td>${chambre.loyer} FCFA</td>
-                        <td>
-                            <button class="btn btn-secondary btn-sm" onclick="enregistrerPaiement('${locataire.id}')">Paiement</button>
-                            <button class="btn btn-danger btn-sm" onclick="supprimerLocataire('${locataire.id}')">Supprimer</button>
+                        <td data-label="Nom">${locataire.nom}</td>
+                        <td  data-label="Prénom">${locataire.prenom}</td>
+                        <td  data-label="Téléphone">${locataire.telephone}</td>
+                        <td  data-label="Chambre">${chambre.numero}</td>
+                        <td  data-label="Loyer">${chambre.loyer} FCFA</td>
+                        <td data-label="Actions">
+                            <button class="btn btn-secondary btn-sm" onclick="enregistrerPaiement('${locataire.id}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="supprimerLocataire('${locataire.id}')"><i class="fas fa-trash"></i></button>
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -1330,12 +1399,12 @@
             depensesMois.forEach(depense => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${formatDate(depense.date)}</td>
-                    <td>${depense.type}</td>
-                    <td>${depense.montant.toFixed(2)} FCFA</td>
-                    <td>${depense.description}</td>
-                    <td>
-                        <button class="btn btn-danger btn-sm" onclick="supprimerDepense('${depense.id}')">Supprimer</button>
+                    <td data-label="Date">${formatDate(depense.date)}</td>
+                    <td data-label="Type">${depense.type}</td>
+                    <td data-label="Montant">${depense.montant.toFixed(2)} FCFA</td>
+                    <td data-label="Description ">${depense.description}</td>
+                    <td data-label="Actions">
+                        <button class="btn btn-danger btn-sm" onclick="supprimerDepense('${depense.id}')"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
                 tbodyDepenses.appendChild(tr);
@@ -1355,13 +1424,13 @@
                 const tr = document.createElement('tr');
                 if (paiement) {
                     tr.innerHTML = `
-                        <td>${locataire.nom} ${locataire.prenom}</td>
-                        <td>${chambre.numero}</td>
-                        <td>${paiement.montantLoyer.toFixed(2)} FCFA</td>
-                        <td>${paiement.montantElectricite.toFixed(2)} FCFA</td>
-                        <td>${paiement.montantEau.toFixed(2)} FCFA</td>
-                        <td>${paiement.total.toFixed(2)} FCFA</td>
-                        <td><span class="badge bg-success">Payé</span></td>
+                        <td data-label="Locataire">${locataire.nom} ${locataire.prenom}</td>
+                        <td data-label="Chambre">${chambre.numero}</td>
+                        <td data-label="Loyer">${paiement.montantLoyer.toFixed(2)} FCFA</td>
+                        <td data-label="Électricité">${paiement.montantElectricite.toFixed(2)} FCFA</td>
+                        <td data-label="Eau">${paiement.montantEau.toFixed(2)} FCFA</td>
+                        <td data-label="Total">${paiement.total.toFixed(2)} FCFA</td>
+                        <td data-label="Statut"><span class="badge bg-success">Payé</span></td>
                     `;
                 } else {
                     tr.innerHTML = `
