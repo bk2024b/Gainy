@@ -1209,7 +1209,8 @@
                         <td  data-label="Chambre">${chambre.numero}</td>
                         <td  data-label="Loyer">${chambre.loyer} FCFA</td>
                         <td data-label="Actions">
-                           
+                            <button class="btn btn-secondary btn-sm" onclick="enregistrerPaiement('${locataire.id}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="supprimerLocataire('${locataire.id}')"><i class="fas fa-trash"></i></button>
                         </td>
                     `;
                     tbody.appendChild(tr);
