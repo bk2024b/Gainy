@@ -759,12 +759,12 @@
                         <table id="table-locataires">
                             <thead>
                                 <tr>
-                                    <th data-label="Nom">Nom</th>
-                                    <th data-label="Prénom">Prénom</th>
-                                    <th data-label="Téléphone">Téléphone</th>
-                                    <th data-label="Chambre">Chambre</th>
-                                    <th data-label="Loyer">Loyer</th>
-                                    <th data-label="Actions">Actions <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
+                                    <th >Nom</th>
+                                    <th>Prénom</th>
+                                    <th>Téléphone</th>
+                                    <th>Chambre</th>
+                                    <th>Loyer</th>
+                                    <th>Actions <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
                     <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button></th>
                                 </tr>
                             </thead>
@@ -1204,14 +1204,14 @@
                 if (chambre) {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td>${locataire.nom}</td>
-                        <td>${locataire.prenom}</td>
-                        <td>${locataire.telephone}</td>
-                        <td>${chambre.numero}</td>
-                        <td>${chambre.loyer} FCFA</td>
-                        <td>
-                            <button class="btn btn-secondary btn-sm" onclick="enregistrerPaiement('${locataire.id}')">Paiement</button>
-                            <button class="btn btn-danger btn-sm" onclick="supprimerLocataire('${locataire.id}')">Supprimer</button>
+                        <td data-label="Nom">${locataire.nom}</td>
+                        <td  data-label="Prénom">${locataire.prenom}</td>
+                        <td  data-label="Téléphone">${locataire.telephone}</td>
+                        <td  data-label="Numéro">${chambre.numero}</td>
+                        <td  data-label="Loyer">${chambre.loyer} FCFA</td>
+                        <td data-label="Actions">
+                            <button class="btn btn-secondary btn-sm" onclick="enregistrerPaiement('${locataire.id}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="supprimerLocataire('${locataire.id}')"><i class="fas fa-trash"></button>
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -1400,12 +1400,12 @@
             depensesMois.forEach(depense => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${formatDate(depense.date)}</td>
-                    <td>${depense.type}</td>
-                    <td>${depense.montant.toFixed(2)} FCFA</td>
-                    <td>${depense.description}</td>
-                    <td>
-                        <button class="btn btn-danger btn-sm" onclick="supprimerDepense('${depense.id}')">Supprimer</button>
+                    <td data-label="Date">${formatDate(depense.date)}</td>
+                    <td data-label="Type">${depense.type}</td>
+                    <td data-label="Montant">${depense.montant.toFixed(2)} FCFA</td>
+                    <td data-label="Description ">${depense.description}</td>
+                    <td data-label="Actions">
+                        <button class="btn btn-danger btn-sm" onclick="supprimerDepense('${depense.id}')"><i class="fas fa-trash"></button>
                     </td>
                 `;
                 tbodyDepenses.appendChild(tr);
