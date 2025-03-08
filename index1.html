@@ -799,5 +799,490 @@
                     
                     <div id="tab-depenses" class="tab-content active">
                         <h3><i class="fas fa-plus-circle"></i> Ajouter une dépense</h3>
-                        <form id="depense-form">
-                            <div class="form-
+                      <script>
+        // Base de données JSON
+        let db = {
+            proprietaire: null,
+            chambres: [],
+            locataires: [],
+            paiements: [],
+            depenses: [],
+            constantes: {
+                prixKwh: 0,
+                prixEau: 0
+            }
+        };
+
+        // Fonction pour charger les données depuis le localStorage
+        function loadData() {
+            const savedData = localStorage.getItem('gainyData');
+            if (savedData) {
+                db = JSON.parse(savedData);
+                checkSetup();
+            } else {
+                showPage('landing-page');
+            }
+        }
+
+        // Fonction pour sauvegarder les données dans le localStorage
+        function saveData() {
+            localStorage.setItem('gainyData', JSON.stringify(db));
+        }
+
+        // Fonction pour vérifier la configuration
+        function checkSetup() {
+            if (!db.proprietaire) {
+                showPage('proprietaire-page');
+            } else if (db.chambres.length === 0) {
+                showPage('chambres-page');
+            } else if (db.constantes.prixKwh === 0) {
+                showPage('constantes-page');
+            } else {
+                showPage('dashboard-page');
+                updateDashboard();
+            }
+        }
+
+        // Fonction pour afficher une page
+        function showPage(pageId) {
+            // Cacher toutes les pages
+            document.querySelectorAll('#app > div').forEach(page => {
+                page.classList.add('hidden');
+            });
+            
+            // Afficher la page demandée
+            document.getElementById(pageId).classList.remove('hidden');
+            
+            // Initialisation spécifique à certaines pages
+            if (pageId === 'chambres-page') {
+                refreshChambresTable();
+            } else if (pageId === 'locataires-page') {
+                refreshLocatairesTable();
+                populateChambresSelect();
+            } else if (pageId === 'dashboard-page') {
+                const today = new Date();
+                document.getElementById('mois-dashboard').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+                updateDashboard();
+            }
+        }
+
+        // Gestion du formulaire du propriétaire
+        document.getElementById('proprio-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            db.proprietaire = {
+                nom: document.getElementById('nom-proprio').value,
+                prenom: document.getElementById('prenom-proprio').value,
+                telephone: document.getElementById('tel-proprio').value
+            };
+            
+            saveData();
+            showPage('chambres-page');
+        });
+
+        // Gestion du formulaire des chambres
+        document.getElementById('chambre-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const chambre = {
+                id: Date.now().toString(),
+                numero: document.getElementById('numero-chambre').value,
+                loyer: parseInt(document.getElementById('loyer-chambre').value),
+                statut: 'libre'
+            };
+            
+            db.chambres.push(chambre);
+            saveData();
+            
+            document.getElementById('numero-chambre').value = '';
+            document.getElementById('loyer-chambre').value = '';
+            
+            refreshChambresTable();
+        });
+
+        // Fonction pour rafraîchir la table des chambres
+        function refreshChambresTable() {
+            const tbody = document.querySelector('#table-chambres tbody');
+            tbody.innerHTML = '';
+            
+            db.chambres.forEach(chambre => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${chambre.numero}</td>
+                    <td>${chambre.loyer} FCFA</td>
+                    <td>${chambre.statut}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="supprimerChambre('${chambre.id}')">Supprimer</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Fonction pour supprimer une chambre
+        function supprimerChambre(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette chambre ?')) {
+                const index = db.chambres.findIndex(c => c.id === id);
+                db.chambres.splice(index, 1);
+                saveData();
+                refreshChambresTable();
+            }
+        }
+
+        // Gestion du bouton "Terminer chambres"
+        document.getElementById('terminer-chambres').addEventListener('click', function() {
+            if (db.chambres.length > 0) {
+                showPage('constantes-page');
+            } else {
+                alert('Veuillez ajouter au moins une chambre');
+            }
+        });
+
+        // Gestion du formulaire des constantes
+        document.getElementById('constantes-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            db.constantes = {
+                prixKwh: parseFloat(document.getElementById('prix-kwh').value),
+                prixEau: parseFloat(document.getElementById('prix-eau').value)
+            };
+            
+            saveData();
+            showPage('locataires-page');
+        });
+
+        // Fonction pour montrer le formulaire d'ajout de locataire
+        function showLocataireForm() {
+            document.getElementById('locataire-form-container').classList.remove('hidden');
+        }
+
+        // Fonction pour peupler le select des chambres
+        function populateChambresSelect() {
+            const select = document.getElementById('chambre-locataire');
+            select.innerHTML = '<option value="">Sélectionner une chambre</option>';
+            
+            const chambresLibres = db.chambres.filter(c => c.statut === 'libre');
+            chambresLibres.forEach(chambre => {
+                const option = document.createElement('option');
+                option.value = chambre.id;
+                option.textContent = `${chambre.numero} - ${chambre.loyer} FCFA`;
+                select.appendChild(option);
+            });
+        }
+
+        // Gestion du formulaire d'ajout de locataire
+        document.getElementById('locataire-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const chambreId = document.getElementById('chambre-locataire').value;
+            if (!chambreId) {
+                alert('Veuillez sélectionner une chambre');
+                return;
+            }
+            
+            const chambre = db.chambres.find(c => c.id === chambreId);
+            
+            const locataire = {
+                id: Date.now().toString(),
+                nom: document.getElementById('nom-locataire').value,
+                prenom: document.getElementById('prenom-locataire').value,
+                telephone: document.getElementById('tel-locataire').value,
+                chambreId: chambreId,
+                debutCompteur: parseFloat(document.getElementById('debut-compteur').value),
+                dernierReleve: parseFloat(document.getElementById('debut-compteur').value),
+                dateArrivee: new Date().toISOString().slice(0, 10)
+            };
+            
+            db.locataires.push(locataire);
+            
+            // Mettre à jour le statut de la chambre
+            chambre.statut = 'occupée';
+            
+            saveData();
+            
+            document.getElementById('locataire-form').reset();
+            document.getElementById('locataire-form-container').classList.add('hidden');
+            
+            refreshLocatairesTable();
+            populateChambresSelect();
+        });
+
+        // Fonction pour rafraîchir la table des locataires
+        function refreshLocatairesTable() {
+            const tbody = document.querySelector('#table-locataires tbody');
+            tbody.innerHTML = '';
+            
+            db.locataires.forEach(locataire => {
+                const chambre = db.chambres.find(c => c.id === locataire.chambreId);
+                
+                if (chambre) {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${locataire.nom}</td>
+                        <td>${locataire.prenom}</td>
+                        <td>${locataire.telephone}</td>
+                        <td>${chambre.numero}</td>
+                        <td>${chambre.loyer} FCFA</td>
+                        <td>
+                            <button class="btn btn-secondary btn-sm" onclick="enregistrerPaiement('${locataire.id}')">Paiement</button>
+                            <button class="btn btn-danger btn-sm" onclick="supprimerLocataire('${locataire.id}')">Supprimer</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+            });
+        }
+
+        // Fonction pour supprimer un locataire
+        function supprimerLocataire(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce locataire ?')) {
+                const locataire = db.locataires.find(l => l.id === id);
+                const chambre = db.chambres.find(c => c.id === locataire.chambreId);
+                
+                // Libérer la chambre
+                if (chambre) {
+                    chambre.statut = 'libre';
+                }
+                
+                // Supprimer le locataire
+                const index = db.locataires.findIndex(l => l.id === id);
+                db.locataires.splice(index, 1);
+                
+                saveData();
+                refreshLocatairesTable();
+                populateChambresSelect();
+            }
+        }
+
+        // Fonction pour enregistrer un paiement
+        function enregistrerPaiement(locataireId) {
+            const locataire = db.locataires.find(l => l.id === locataireId);
+            const chambre = db.chambres.find(c => c.id === locataire.chambreId);
+            
+            document.getElementById('paiement-locataire-id').value = locataireId;
+            document.getElementById('ancien-relevé').textContent = locataire.dernierReleve;
+            document.getElementById('montant-loyer').value = chambre.loyer;
+            
+            // Initialiser la date
+            const today = new Date();
+            document.getElementById('date-paiement').value = today.toISOString().slice(0, 10);
+            document.getElementById('mois-paiement').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+            
+            showPage('paiement-page');
+        }
+
+        // Calcul automatique des montants lors de la saisie du nouveau relevé
+        document.getElementById('relevé-compteur').addEventListener('input', function() {
+            const ancienReleve = parseFloat(document.getElementById('ancien-relevé').textContent);
+            const nouveauReleve = parseFloat(this.value || 0);
+            
+            if (nouveauReleve < ancienReleve) {
+                alert('Le nouveau relevé ne peut pas être inférieur à l\'ancien');
+                this.value = ancienReleve;
+                return;
+            }
+            
+            const consommation = nouveauReleve - ancienReleve;
+            const montantElectricite = consommation * db.constantes.prixKwh;
+            // Estimation de l'eau basée sur la consommation électrique
+            const montantEau = consommation * db.constantes.prixEau * 0.2; // Facteur arbitraire de corrélation
+            const totalPaiement = parseFloat(document.getElementById('montant-loyer').value || 0) + montantElectricite + montantEau;
+            
+            document.getElementById('consommation').textContent = consommation.toFixed(2);
+            document.getElementById('montant-électricité').textContent = montantElectricite.toFixed(2);
+            document.getElementById('montant-eau').textContent = montantEau.toFixed(2);
+            document.getElementById('total-paiement').textContent = totalPaiement.toFixed(2);
+        });
+
+        // Gestion du formulaire de paiement
+        document.getElementById('paiement-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const locataireId = document.getElementById('paiement-locataire-id').value;
+            const locataire = db.locataires.find(l => l.id === locataireId);
+            const ancienReleve = locataire.dernierReleve;
+            const nouveauReleve = parseFloat(document.getElementById('relevé-compteur').value);
+            const consommation = nouveauReleve - ancienReleve;
+            const montantElectricite = consommation * db.constantes.prixKwh;
+            const montantEau = consommation * db.constantes.prixEau * 0.2;
+            
+            const paiement = {
+                id: Date.now().toString(),
+                locataireId: locataireId,
+                date: document.getElementById('date-paiement').value,
+                mois: document.getElementById('mois-paiement').value,
+                montantLoyer: parseFloat(document.getElementById('montant-loyer').value),
+                ancienReleve: ancienReleve,
+                nouveauReleve: nouveauReleve,
+                consommation: consommation,
+                montantElectricite: montantElectricite,
+                montantEau: montantEau,
+                total: parseFloat(document.getElementById('montant-loyer').value) + montantElectricite + montantEau
+            };
+            
+            db.paiements.push(paiement);
+            
+            // Mettre à jour le dernier relevé du locataire
+            locataire.dernierReleve = nouveauReleve;
+            
+            saveData();
+            
+            alert('Paiement enregistré avec succès');
+            showPage('locataires-page');
+        });
+
+        // Gestion du formulaire d'ajout de dépense
+        document.getElementById('depense-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const depense = {
+                id: Date.now().toString(),
+                date: document.getElementById('date-depense').value,
+                type: document.getElementById('type-depense').value,
+                montant: parseFloat(document.getElementById('montant-depense').value),
+                description: document.getElementById('description-depense').value
+            };
+            
+            db.depenses.push(depense);
+            saveData();
+            
+            document.getElementById('depense-form').reset();
+            updateDashboard();
+        });
+
+        // Fonction pour supprimer une dépense
+        function supprimerDepense(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette dépense ?')) {
+                const index = db.depenses.findIndex(d => d.id === id);
+                db.depenses.splice(index, 1);
+                saveData();
+                updateDashboard();
+            }
+          }
+
+        // Fonction pour mettre à jour le tableau de bord
+        function updateDashboard() {
+            // Afficher les informations du propriétaire
+            if (db.proprietaire) {
+                document.getElementById('info-proprio').innerHTML = `
+                    <p><strong>Nom:</strong> ${db.proprietaire.nom} ${db.proprietaire.prenom}</p>
+                    <p><strong>Téléphone:</strong> ${db.proprietaire.telephone}</p>
+                `;
+            }
+            
+            // Récapitulatif
+            document.getElementById('nombre-chambres').textContent = db.chambres.length;
+            document.getElementById('nombre-locataires').textContent = db.locataires.length;
+            
+            const tauxOccupation = db.chambres.length > 0 
+                ? Math.round((db.chambres.filter(c => c.statut === 'occupée').length / db.chambres.length) * 100) 
+                : 0;
+            document.getElementById('taux-occupation').textContent = tauxOccupation + '%';
+            
+            // Filtrer par mois sélectionné
+            const moisSelectionne = document.getElementById('mois-dashboard').value;
+            
+            // Calculer les revenus du mois (paiements)
+            const paiementsMois = db.paiements.filter(p => p.mois === moisSelectionne);
+            const revenus = paiementsMois.reduce((sum, p) => sum + p.total, 0);
+            document.getElementById('revenus-mois').textContent = revenus.toFixed(2);
+            
+            // Calculer les dépenses du mois
+            const depensesMois = db.depenses.filter(d => {
+                const depenseDate = new Date(d.date);
+                const depenseMois = `${depenseDate.getFullYear()}-${String(depenseDate.getMonth() + 1).padStart(2, '0')}`;
+                return depenseMois === moisSelectionne;
+            });
+            
+            const depensesTotal = depensesMois.reduce((sum, d) => sum + d.montant, 0);
+            document.getElementById('depenses-mois').textContent = depensesTotal.toFixed(2);
+            
+            // Calculer la rentabilité
+            const rentabilite = revenus - depensesTotal;
+            const rentabiliteElem = document.getElementById('rentabilite-mois');
+            rentabiliteElem.textContent = rentabilite.toFixed(2);
+            if (rentabilite >= 0) {
+                rentabiliteElem.className = 'number profit';
+            } else {
+                rentabiliteElem.className = 'number loss';
+            }
+            
+            // Afficher la liste des dépenses du mois
+            const tbodyDepenses = document.querySelector('#table-depenses tbody');
+            tbodyDepenses.innerHTML = '';
+            
+            depensesMois.forEach(depense => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${formatDate(depense.date)}</td>
+                    <td>${depense.type}</td>
+                    <td>${depense.montant.toFixed(2)} FCFA</td>
+                    <td>${depense.description}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="supprimerDepense('${depense.id}')">Supprimer</button>
+                    </td>
+                `;
+                tbodyDepenses.appendChild(tr);
+            });
+            
+            // Afficher l'état des paiements du mois
+            const tbodyPaiements = document.querySelector('#table-paiements tbody');
+            tbodyPaiements.innerHTML = '';
+            
+            // Pour chaque locataire, vérifier s'il a payé pour le mois sélectionné
+            db.locataires.forEach(locataire => {
+                const chambre = db.chambres.find(c => c.id === locataire.chambreId);
+                if (!chambre) return;
+                
+                const paiement = paiementsMois.find(p => p.locataireId === locataire.id);
+                
+                const tr = document.createElement('tr');
+                if (paiement) {
+                    tr.innerHTML = `
+                        <td>${locataire.nom} ${locataire.prenom}</td>
+                        <td>${chambre.numero}</td>
+                        <td>${paiement.montantLoyer.toFixed(2)} FCFA</td>
+                        <td>${paiement.montantElectricite.toFixed(2)} FCFA</td>
+                        <td>${paiement.montantEau.toFixed(2)} FCFA</td>
+                        <td>${paiement.total.toFixed(2)} FCFA</td>
+                        <td><span class="badge bg-success">Payé</span></td>
+                    `;
+                } else {
+                    tr.innerHTML = `
+                        <td>${locataire.nom} ${locataire.prenom}</td>
+                        <td>${chambre.numero}</td>
+                        <td>${chambre.loyer} FCFA</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>${chambre.loyer} FCFA</td>
+                        <td><span class="badge bg-danger">Non payé</span></td>
+                    `;
+                }
+                tbodyPaiements.appendChild(tr);
+            });
+        }
+
+        // Fonction utilitaire pour formater les dates
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+        }
+
+        // Initialisation de l'application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            
+            // Initialiser le mois courant pour le dashboard
+            const today = new Date();
+            document.getElementById('mois-dashboard').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+        });
+
+        // Fonction pour réinitialiser toutes les données (pour le développement)
+        function resetData() {
+            if (confirm('Attention! Cela va effacer toutes vos données. Êtes-vous sûr?')) {
+                localStorage.removeItem('gainyData');
+                location.reload();
+            }
+        }
+    </script>
+                            
