@@ -1,1 +1,1405 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gainy - Gestion de Locations</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --success-color: #4CAF50;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #333;
+            --white: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
 
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        h1, h2, h3 {
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            border-bottom: 2px solid var(--medium-gray);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            margin-top: 15px;
+        }
+
+        p {
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary-color);
+            border: none;
+            color: var(--white);
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        th, td {
+            border: 1px solid var(--medium-gray);
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        tr:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .dashboard-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card {
+            flex: 1;
+            min-width: 250px;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            transition: var(--transition);
+        }
+
+        .dashboard-card:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .dashboard-card h3 {
+            margin-top: 0;
+            border-bottom: 1px solid var(--medium-gray);
+            padding-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .number {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .profit {
+            color: var(--success-color);
+        }
+
+        .loss {
+            color: var(--danger-color);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .bg-success {
+            background-color: var(--success-color);
+        }
+
+        .bg-danger {
+            background-color: var(--danger-color);
+        }
+
+        .app-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            padding: 20px;
+            text-align: center;
+            border-radius: var(--border-radius);
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .app-header h1 {
+            color: var(--white);
+            margin: 0;
+        }
+
+        .app-header p {
+            margin: 10px 0 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .menu-button {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: var(--white);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 60px;
+            font-size: 24px;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .menu-button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .nav-menu {
+            display: none;
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 15px;
+            z-index: 999;
+        }
+
+        .nav-menu a {
+            display: block;
+            padding: 10px 15px;
+            color: var(--dark-gray);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .nav-menu a:hover {
+            background-color: var(--light-gray);
+            color: var(--primary-color);
+        }
+
+        /* Statistics and info boxes */
+        .info-box {
+            display: flex;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            align-items: center;
+        }
+
+        .info-box-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: rgba(67, 97, 238, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        .info-box-content {
+            flex: 1;
+        }
+
+        .info-box-content h3 {
+            margin: 0 0 5px;
+            font-size: 18px;
+        }
+
+        .info-box-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--dark-gray);
+        }
+
+        /* Responsive table layout */
+        @media screen and (max-width: 768px) {
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .dashboard-cards {
+                flex-direction: column;
+            }
+
+            .dashboard-card {
+                width: 100%;
+            }
+
+            .menu-button {
+                display: block;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .card {
+                padding: 20px;
+            }
+        }
+
+        /* Animation for pages */
+        .page-enter {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .page-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 300ms, transform 300ms;
+        }
+
+        /* Tab system for dashboard */
+        .tab-container {
+            margin-bottom: 20px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--medium-gray);
+            padding-bottom: 10px;
+        }
+
+        .tab-button {
+            padding: 10px 20px;
+            background-color: var(--medium-gray);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .tab-button.active {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Summary cards in dashboard */
+        .summary-card {
+            padding: 20px;
+            border-radius: var(--border-radius);
+            color: var(--white);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-card i {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 40px;
+            opacity: 0.3;
+        }
+
+        .summary-card.income {
+            background: linear-gradient(135deg, #43a047, #2e7d32);
+        }
+
+        .summary-card.expenses {
+            background: linear-gradient(135deg, #e53935, #c62828);
+        }
+
+        .summary-card.occupancy {
+            background: linear-gradient(135deg, #1e88e5, #1565c0);
+        }
+
+        .summary-card h3 {
+            color: var(--white);
+            margin-bottom: 10px;
+            font-size: 18px;
+            border: none;
+        }
+
+        .summary-card .number {
+            font-size: 30px;
+            color: var(--white);
+        }
+
+        /* Payment form styling */
+        .payment-summary {
+            background-color: rgba(67, 97, 238, 0.05);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .payment-summary .total {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--medium-gray);
+        }
+
+        /* Loading indicator */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading i {
+            font-size: 40px;
+            color: var(--primary-color);
+            animation: spin 1s infinite linear;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Les différentes pages de l'application -->
+        <div id="landing-page" class="container">
+            <div class="app-header">
+                <h1><i class="fas fa-home"></i> Gainy</h1>
+                <p>Gérez vos locations de chambres simplement et efficacement</p>
+            </div>
+            <div class="card">
+                <h1>Bienvenue sur Gainy</h1>
+                <p>L'application qui vous aide à gérer vos locations de chambres simplement et efficacement.</p>
+                <p>Suivez vos revenus, organisez vos dépenses et gardez le contrôle sur votre activité de location.</p>
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn" onclick="showPage('proprietaire-page')"><i class="fas fa-arrow-right"></i> Commencer</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="proprietaire-page" class="container hidden">
+            <div class="app-header">
+                <h1><i class="fas fa-user"></i> Informations du Propriétaire</h1>
+            </div>
+            <div class="card">
+                <h2>Informations du Propriétaire</h2>
+                <p>Pour commencer, merci de renseigner vos informations personnelles.</p>
+                <form id="proprio-form">
+                    <div class="form-group">
+                        <label for="nom-proprio"><i class="fas fa-user"></i> Nom</label>
+                        <input type="text" id="nom-proprio" required placeholder="Entrez votre nom">
+                    </div>
+                    <div class="form-group">
+                        <label for="prenom-proprio"><i class="fas fa-user"></i> Prénom</label>
+                        <input type="text" id="prenom-proprio" required placeholder="Entrez votre prénom">
+                    </div>
+                    <div class="form-group">
+                        <label for="tel-proprio"><i class="fas fa-phone"></i> Numéro de téléphone</label>
+                        <input type="tel" id="tel-proprio" required placeholder="Entrez votre numéro de téléphone">
+                    </div>
+                    <div style="text-align: center; margin-top: 30px;">
+                        <button type="submit" class="btn"><i class="fas fa-save"></i> Enregistrer et continuer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="chambres-page" class="container hidden">
+            <div class="app-header">
+                <h1><i class="fas fa-bed"></i> Gestion des Chambres</h1>
+            </div>
+            <div class="card">
+                <h2>Enregistrement des Chambres</h2>
+                <p>Ajoutez les chambres que vous souhaitez mettre en location.</p>
+                <form id="chambre-form">
+                    <div class="form-group">
+                        <label for="numero-chambre"><i class="fas fa-hashtag"></i> Numéro ou identifiant de la chambre</label>
+                        <input type="text" id="numero-chambre" required placeholder="Ex: Chambre 1, Studio A, etc.">
+                    </div>
+                    <div class="form-group">
+                        <label for="loyer-chambre"><i class="fas fa-money-bill-wave"></i> Loyer mensuel (FCFA)</label>
+                        <input type="number" id="loyer-chambre" required placeholder="Montant du loyer mensuel">
+                    </div>
+                    <div style="text-align: center;">
+                        <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i> Ajouter la chambre</button>
+                    </div>
+                </form>
+                <div id="liste-chambres" style="margin-top: 30px;">
+                    <h3><i class="fas fa-list"></i> Liste des chambres</h3>
+                    <div class="table-responsive">
+                        <table id="table-chambres">
+                            <thead>
+                                <tr>
+                                    <th>Numéro</th>
+                                    <th>Loyer mensuel</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-secondary" id="terminer-chambres"><i class="fas fa-arrow-right"></i> Terminer et continuer</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="constantes-page" class="container hidden">
+            <div class="app-header">
+                <h1><i class="fas fa-sliders-h"></i> Paramètres</h1>
+            </div>
+            <div class="card">
+                <h2>Définition des Constantes</h2>
+                <p>Définissez les prix constants qui seront utilisés pour vos calculs.</p>
+                <form id="constantes-form">
+                    <div class="form-group">
+                        <label for="prix-kwh"><i class="fas fa-bolt"></i> Prix du kilowattheure (FCFA)</label>
+                        <input type="number" id="prix-kwh" required placeholder="Prix unitaire du kWh">
+                    </div>
+                    <div class="form-group">
+                        <label for="prix-eau"><i class="fas fa-tint"></i> Prix base de l'eau (FCFA par m³)</label>
+                        <input type="number" id="prix-eau" required placeholder="Prix unitaire du m³ d'eau">
+                    </div>
+                    <div style="text-align: center; margin-top: 30px;">
+                        <button type="submit" class="btn"><i class="fas fa-save"></i> Enregistrer et continuer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="locataires-page" class="container hidden">
+            <div class="app-header">
+                <h1><i class="fas fa-users"></i> Gestion des Locataires</h1>
+            </div>
+            <div class="card">
+                <h2>Gestion des Locataires</h2>
+                <p>Ajoutez et gérez vos locataires.</p>
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <button class="btn btn-success" onclick="showLocataireForm()"><i class="fas fa-user-plus"></i> Ajouter un locataire</button>
+                    <button class="btn btn-secondary" onclick="showPage('dashboard-page')"><i class="fas fa-chart-bar"></i> Voir le tableau de bord</button>
+                </div>
+                
+                <div id="locataire-form-container" class="hidden card" style="margin-top: 20px;">
+                    <h3><i class="fas fa-user-plus"></i> Nouveau Locataire</h3>
+                    <form id="locataire-form">
+                        <div class="form-group">
+                            <label for="nom-locataire"><i class="fas fa-user"></i> Nom</label>
+                            <input type="text" id="nom-locataire" required placeholder="Nom du locataire">
+                        </div>
+                        <div class="form-group">
+                            <label for="prenom-locataire"><i class="fas fa-user"></i> Prénom</label>
+                            <input type="text" id="prenom-locataire" required placeholder="Prénom du locataire">
+                        </div>
+                        <div class="form-group">
+                            <label for="tel-locataire"><i class="fas fa-phone"></i> Numéro de téléphone</label>
+                            <input type="tel" id="tel-locataire" required placeholder="Numéro de téléphone du locataire">
+                        </div>
+                        <div class="form-group">
+                            <label for="chambre-locataire"><i class="fas fa-bed"></i> Chambre</label>
+                            <select id="chambre-locataire" required>
+                                <option value="">Sélectionner une chambre</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="debut-compteur"><i class="fas fa-bolt"></i> Relevé initial du compteur électrique (kWh)</label>
+                            <input type="number" id="debut-compteur" required placeholder="Relevé initial du compteur">
+                        </div>
+                        <div style="text-align: center;">
+                            <button type="submit" class="btn"><i class="fas fa-save"></i> Enregistrer le locataire</button>
+                            <button type="button" class="btn btn-danger" onclick="hideLocataireForm()"><i class="fas fa-times"></i> Annuler</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div id="liste-locataires" style="margin-top: 20px;">
+                    <h3><i class="fas fa-list"></i> Liste des locataires</h3>
+                    <div class="table-responsive">
+                        <table id="table-locataires">
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Prénom</th>
+                                    <th>Téléphone</th>
+                                    <th>Chambre</th>
+                                    <th>Loyer</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="paiement-page" class="container hidden">
+            <div class="app-header">
+                <h1><i class="fas fa-money-bill-wave"></i> Paiement du Loyer</h1>
+            </div>
+            <div class="card">
+                <h2>Paiement du Loyer et Charges</h2>
+                <div id="locataire-info" style="margin-bottom: 20px;"></div>
+                <form id="paiement-form">
+                    <input type="hidden" id="paiement-locataire-id">
+                    <div class="form-group">
+                        <label for="date-paiement"><i class="fas fa-calendar-alt"></i> Date du paiement</label>
+                        <input type="date" id="date-paiement" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mois-paiement"><i class="fas fa-calendar-check"></i> Mois concerné</label>
+                        <input type="month" id="mois-paiement" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="montant-loyer"><i class="fas fa-home"></i> Montant du loyer payé (FCFA)</label>
+                        <input type="number" id="montant-loyer" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="relevé-compteur"><i class="fas fa-bolt"></i> Nouveau relevé du compteur électrique (kWh)</label>
+                        <input type="number" id="relevé-compteur" required>
+                    </div>
+                    <div id="calcul-électricité" class="payment-summary">
+                        <p><i class="fas fa-history"></i> Ancien relevé: <span id="ancien-relevé">0</span> kWh</p>
+                        <p><i class="fas fa-plug"></i> Consommation: <span id="consommation">0</span> kWh</p>
+                        <p><i class="fas fa-bolt"></i> Montant électricité: <span id="montant-électricité">0</span> FCFA</p>
+                        <p><i class="fas fa-tint"></i> Estimation eau: <span id="montant-eau">0</span> FCFA</p>
+                        <p class="total"><i class="fas fa-money-bill-wave"></i> Total à payer: <span id="total-paiement">0</span> FCFA</p>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                        <button type="button" class="btn btn-danger" onclick="showPage('locataires-page')"><i class="fas fa-arrow-left"></i> Retour</button>
+                        <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Enregistrer le paiement</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="dashboard-page" class="container hidden">
+            <div class="app-header">
+                <h1><i class="fas fa-chart-line"></i> Tableau de Bord</h1>
+            </div>
+            
+            <div class="card">
+                <div class="form-group">
+                    <label for="mois-dashboard"><i class="fas fa-calendar-alt"></i> Période d'analyse</label>
+                    <input type="month" id="mois-dashboard" onchange="updateDashboard()">
+                </div>
+                
+                <div id="dashboard-summary" class="dashboard-cards">
+                    <div class="summary-card income">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <h3>Revenus</h3>
+                        <div class="number" id="revenus-mois">0 FCFA</div>
+                    </div>
+                    
+                    <div class="summary-card expenses">
+                        <i class="fas fa-file-invoice"></i>
+                        <h3>Dépenses</h3>
+                        <div class="number" id="depenses-mois">0 FCFA</div>
+                    </div>
+                    
+                    <div class="summary-card occupancy">
+                        <i class="fas fa-percentage"></i>
+                        <h3>Taux d'occupation</h3>
+                        <div class="number" id="taux-occupation">0%</div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-cards">
+                    <div class="dashboard-card">
+                        <h3><i class="fas fa-user"></i> Propriétaire</h3>
+                        <p id="info-proprio"></p>
+                    </div>
+                    <div class="dashboard-card">
+                        <h3><i class="fas fa-info-circle"></i> Récapitulatif</h3>
+                        <p><i class="fas fa-bed"></i> Chambres: <span id="nombre-chambres" class="number">0</span></p>
+                        <p><i class="fas fa-users"></i> Locataires: <span id="nombre-locataires" class="number">0</span></p>
+                        <p><i class="fas fa-calculator"></i> Rentabilité: <span id="rentabilite-mois" class="number">0 FCFA</span></p>
+                    </div>
+                </div>
+                
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="showTab('tab-depenses')"><i class="fas fa-file-invoice"></i> Dépenses</button>
+                        <button class="tab-button" onclick="showTab('tab-paiements')"><i class="fas fa-money-check-alt"></i> Paiements</button>
+                    </div>
+                    
+                    <div id="tab-depenses" class="tab-content active">
+                        <h3><i class="fas fa-plus-circle"></i> Ajouter une dépense</h3>
+                            <form id="depense-form">
+                            <div class="form-group">
+                                <label for="date-depense"><i class="fas fa-calendar-alt"></i> Date</label>
+                                <input type="date" id="date-depense" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="type-depense"><i class="fas fa-tags"></i> Type de dépense</label>
+                                <select id="type-depense" required>
+                                    <option value="électricité">Électricité</option>
+                                    <option value="eau">Eau</option>
+                                    <option value="maintenance">Maintenance</option>
+                                    <option value="autre">Autre</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="montant-depense"><i class="fas fa-money-bill-wave"></i> Montant (FCFA)</label>
+                                <input type="number" id="montant-depense" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="description-depense"><i class="fas fa-file-alt"></i> Description</label>
+                                <input type="text" id="description-depense" required>
+                            </div>
+                            <div style="text-align: center;">
+                                <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i> Ajouter la dépense</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="tab-paiements" class="tab-content">
+                        <h3><i class="fas fa-money-check-alt"></i> État des paiements</h3>
+                        <div class="table-responsive">
+                            <table id="table-paiements">
+                                <thead>
+                                    <tr>
+                                        <th>Locataire</th>
+                                        <th>Chambre</th>
+                                        <th>Loyer</th>
+                                        <th>Électricité</th>
+                                        <th>Eau</th>
+                                        <th>Total</th>
+                                        <th>Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fas fa-file-invoice"></i> Dépenses du mois</h3>
+                    <div class="table-responsive">
+                        <table id="table-depenses">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Montant</th>
+                                    <th>Description</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-secondary" onclick="showPage('locataires-page')"><i class="fas fa-arrow-left"></i> Retour à la gestion des locataires</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bouton de menu mobile -->
+    <div class="menu-button" onclick="toggleMenu()">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <!-- Menu de navigation mobile -->
+    <div class="nav-menu hidden">
+        <a href="#" onclick="showPage('dashboard-page')"><i class="fas fa-chart-line"></i> Tableau de bord</a>
+        <a href="#" onclick="showPage('locataires-page')"><i class="fas fa-users"></i> Locataires</a>
+        <a href="#" onclick="showPage('chambres-page')"><i class="fas fa-bed"></i> Chambres</a>
+        <a href="#" onclick="showPage('constantes-page')"><i class="fas fa-sliders-h"></i> Paramètres</a>
+    </div>
+
+    <script>
+        // Fonction pour basculer le menu mobile
+        function toggleMenu() {
+            const menu = document.querySelector('.nav-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Fonction pour afficher un onglet
+        function showTab(tabId) {
+            // Cacher tous les onglets
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Désactiver tous les boutons d'onglet
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Afficher l'onglet sélectionné
+            document.getElementById(tabId).classList.add('active');
+
+            // Activer le bouton correspondant
+            document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
+        }
+
+        // Initialisation des onglets
+        document.addEventListener('DOMContentLoaded', function() {
+            showTab('tab-depenses');
+        });
+          // Base de données JSON
+        let db = {
+            proprietaire: null,
+            chambres: [],
+            locataires: [],
+            paiements: [],
+            depenses: [],
+            constantes: {
+                prixKwh: 0,
+                prixEau: 0
+            }
+        };
+
+        // Fonction pour charger les données depuis le localStorage
+        function loadData() {
+            const savedData = localStorage.getItem('gainyData');
+            if (savedData) {
+                db = JSON.parse(savedData);
+                checkSetup();
+            } else {
+                showPage('landing-page');
+            }
+        }
+
+        // Fonction pour sauvegarder les données dans le localStorage
+        function saveData() {
+            localStorage.setItem('gainyData', JSON.stringify(db));
+        }
+
+        // Fonction pour vérifier la configuration
+        function checkSetup() {
+            if (!db.proprietaire) {
+                showPage('proprietaire-page');
+            } else if (db.chambres.length === 0) {
+                showPage('chambres-page');
+            } else if (db.constantes.prixKwh === 0) {
+                showPage('constantes-page');
+            } else {
+                showPage('dashboard-page');
+                updateDashboard();
+            }
+        }
+
+        // Fonction pour afficher une page
+        function showPage(pageId) {
+            // Cacher toutes les pages
+            document.querySelectorAll('#app > div').forEach(page => {
+                page.classList.add('hidden');
+            });
+            
+            // Afficher la page demandée
+            document.getElementById(pageId).classList.remove('hidden');
+            
+            // Initialisation spécifique à certaines pages
+            if (pageId === 'chambres-page') {
+                refreshChambresTable();
+            } else if (pageId === 'locataires-page') {
+                refreshLocatairesTable();
+                populateChambresSelect();
+            } else if (pageId === 'dashboard-page') {
+                const today = new Date();
+                document.getElementById('mois-dashboard').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+                updateDashboard();
+            }
+        }
+
+        // Gestion du formulaire du propriétaire
+        document.getElementById('proprio-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            db.proprietaire = {
+                nom: document.getElementById('nom-proprio').value,
+                prenom: document.getElementById('prenom-proprio').value,
+                telephone: document.getElementById('tel-proprio').value
+            };
+            
+            saveData();
+            showPage('chambres-page');
+        });
+
+        // Gestion du formulaire des chambres
+        document.getElementById('chambre-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const chambre = {
+                id: Date.now().toString(),
+                numero: document.getElementById('numero-chambre').value,
+                loyer: parseInt(document.getElementById('loyer-chambre').value),
+                statut: 'libre'
+            };
+            
+            db.chambres.push(chambre);
+            saveData();
+            
+            document.getElementById('numero-chambre').value = '';
+            document.getElementById('loyer-chambre').value = '';
+            
+            refreshChambresTable();
+        });
+
+        // Fonction pour rafraîchir la table des chambres
+        function refreshChambresTable() {
+            const tbody = document.querySelector('#table-chambres tbody');
+            tbody.innerHTML = '';
+            
+            db.chambres.forEach(chambre => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${chambre.numero}</td>
+                    <td>${chambre.loyer} FCFA</td>
+                    <td>${chambre.statut}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="supprimerChambre('${chambre.id}')">Supprimer</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Fonction pour supprimer une chambre
+        function supprimerChambre(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette chambre ?')) {
+                const index = db.chambres.findIndex(c => c.id === id);
+                db.chambres.splice(index, 1);
+                saveData();
+                refreshChambresTable();
+            }
+        }
+
+        // Gestion du bouton "Terminer chambres"
+        document.getElementById('terminer-chambres').addEventListener('click', function() {
+            if (db.chambres.length > 0) {
+                showPage('constantes-page');
+            } else {
+                alert('Veuillez ajouter au moins une chambre');
+            }
+        });
+
+        // Gestion du formulaire des constantes
+        document.getElementById('constantes-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            db.constantes = {
+                prixKwh: parseFloat(document.getElementById('prix-kwh').value),
+                prixEau: parseFloat(document.getElementById('prix-eau').value)
+            };
+            
+            saveData();
+            showPage('locataires-page');
+        });
+
+        // Fonction pour montrer le formulaire d'ajout de locataire
+        function showLocataireForm() {
+            document.getElementById('locataire-form-container').classList.remove('hidden');
+        }
+
+        // Fonction pour peupler le select des chambres
+        function populateChambresSelect() {
+            const select = document.getElementById('chambre-locataire');
+            select.innerHTML = '<option value="">Sélectionner une chambre</option>';
+            
+            const chambresLibres = db.chambres.filter(c => c.statut === 'libre');
+            chambresLibres.forEach(chambre => {
+                const option = document.createElement('option');
+                option.value = chambre.id;
+                option.textContent = `${chambre.numero} - ${chambre.loyer} FCFA`;
+                select.appendChild(option);
+            });
+        }
+
+        // Gestion du formulaire d'ajout de locataire
+        document.getElementById('locataire-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const chambreId = document.getElementById('chambre-locataire').value;
+            if (!chambreId) {
+                alert('Veuillez sélectionner une chambre');
+                return;
+            }
+            
+            const chambre = db.chambres.find(c => c.id === chambreId);
+            
+            const locataire = {
+                id: Date.now().toString(),
+                nom: document.getElementById('nom-locataire').value,
+                prenom: document.getElementById('prenom-locataire').value,
+                telephone: document.getElementById('tel-locataire').value,
+                chambreId: chambreId,
+                debutCompteur: parseFloat(document.getElementById('debut-compteur').value),
+                dernierReleve: parseFloat(document.getElementById('debut-compteur').value),
+                dateArrivee: new Date().toISOString().slice(0, 10)
+            };
+            
+            db.locataires.push(locataire);
+            
+            // Mettre à jour le statut de la chambre
+            chambre.statut = 'occupée';
+            
+            saveData();
+            
+            document.getElementById('locataire-form').reset();
+            document.getElementById('locataire-form-container').classList.add('hidden');
+            
+            refreshLocatairesTable();
+            populateChambresSelect();
+        });
+
+        // Fonction pour rafraîchir la table des locataires
+        function refreshLocatairesTable() {
+            const tbody = document.querySelector('#table-locataires tbody');
+            tbody.innerHTML = '';
+            
+            db.locataires.forEach(locataire => {
+                const chambre = db.chambres.find(c => c.id === locataire.chambreId);
+                
+                if (chambre) {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${locataire.nom}</td>
+                        <td>${locataire.prenom}</td>
+                        <td>${locataire.telephone}</td>
+                        <td>${chambre.numero}</td>
+                        <td>${chambre.loyer} FCFA</td>
+                        <td>
+                            <button class="btn btn-secondary btn-sm" onclick="enregistrerPaiement('${locataire.id}')">Paiement</button>
+                            <button class="btn btn-danger btn-sm" onclick="supprimerLocataire('${locataire.id}')">Supprimer</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+            });
+        }
+
+        // Fonction pour supprimer un locataire
+        function supprimerLocataire(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce locataire ?')) {
+                const locataire = db.locataires.find(l => l.id === id);
+                const chambre = db.chambres.find(c => c.id === locataire.chambreId);
+                
+                // Libérer la chambre
+                if (chambre) {
+                    chambre.statut = 'libre';
+                }
+                
+                // Supprimer le locataire
+                const index = db.locataires.findIndex(l => l.id === id);
+                db.locataires.splice(index, 1);
+                
+                saveData();
+                refreshLocatairesTable();
+                populateChambresSelect();
+            }
+        }
+
+        // Fonction pour enregistrer un paiement
+        function enregistrerPaiement(locataireId) {
+            const locataire = db.locataires.find(l => l.id === locataireId);
+            const chambre = db.chambres.find(c => c.id === locataire.chambreId);
+            
+            document.getElementById('paiement-locataire-id').value = locataireId;
+            document.getElementById('ancien-relevé').textContent = locataire.dernierReleve;
+            document.getElementById('montant-loyer').value = chambre.loyer;
+            
+            // Initialiser la date
+            const today = new Date();
+            document.getElementById('date-paiement').value = today.toISOString().slice(0, 10);
+            document.getElementById('mois-paiement').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+            
+            showPage('paiement-page');
+        }
+
+        // Calcul automatique des montants lors de la saisie du nouveau relevé
+        document.getElementById('relevé-compteur').addEventListener('input', function() {
+            const ancienReleve = parseFloat(document.getElementById('ancien-relevé').textContent);
+            const nouveauReleve = parseFloat(this.value || 0);
+            
+            if (nouveauReleve < ancienReleve) {
+                alert('Le nouveau relevé ne peut pas être inférieur à l\'ancien');
+                this.value = ancienReleve;
+                return;
+            }
+            
+            const consommation = nouveauReleve - ancienReleve;
+            const montantElectricite = consommation * db.constantes.prixKwh;
+            // Estimation de l'eau basée sur la consommation électrique
+            const montantEau = consommation * db.constantes.prixEau * 0.2; // Facteur arbitraire de corrélation
+            const totalPaiement = parseFloat(document.getElementById('montant-loyer').value || 0) + montantElectricite + montantEau;
+            
+            document.getElementById('consommation').textContent = consommation.toFixed(2);
+            document.getElementById('montant-électricité').textContent = montantElectricite.toFixed(2);
+            document.getElementById('montant-eau').textContent = montantEau.toFixed(2);
+            document.getElementById('total-paiement').textContent = totalPaiement.toFixed(2);
+        });
+
+        // Gestion du formulaire de paiement
+        document.getElementById('paiement-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const locataireId = document.getElementById('paiement-locataire-id').value;
+            const locataire = db.locataires.find(l => l.id === locataireId);
+            const ancienReleve = locataire.dernierReleve;
+            const nouveauReleve = parseFloat(document.getElementById('relevé-compteur').value);
+            const consommation = nouveauReleve - ancienReleve;
+            const montantElectricite = consommation * db.constantes.prixKwh;
+            const montantEau = consommation * db.constantes.prixEau * 0.2;
+            
+            const paiement = {
+                id: Date.now().toString(),
+                locataireId: locataireId,
+                date: document.getElementById('date-paiement').value,
+                mois: document.getElementById('mois-paiement').value,
+                montantLoyer: parseFloat(document.getElementById('montant-loyer').value),
+                ancienReleve: ancienReleve,
+                nouveauReleve: nouveauReleve,
+                consommation: consommation,
+                montantElectricite: montantElectricite,
+                montantEau: montantEau,
+                total: parseFloat(document.getElementById('montant-loyer').value) + montantElectricite + montantEau
+            };
+            
+            db.paiements.push(paiement);
+            
+            // Mettre à jour le dernier relevé du locataire
+            locataire.dernierReleve = nouveauReleve;
+            
+            saveData();
+            
+            alert('Paiement enregistré avec succès');
+            showPage('locataires-page');
+        });
+
+        // Gestion du formulaire d'ajout de dépense
+        document.getElementById('depense-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const depense = {
+                id: Date.now().toString(),
+                date: document.getElementById('date-depense').value,
+                type: document.getElementById('type-depense').value,
+                montant: parseFloat(document.getElementById('montant-depense').value),
+                description: document.getElementById('description-depense').value
+            };
+            
+            db.depenses.push(depense);
+            saveData();
+            
+            document.getElementById('depense-form').reset();
+            updateDashboard();
+        });
+
+        // Fonction pour supprimer une dépense
+        function supprimerDepense(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette dépense ?')) {
+                const index = db.depenses.findIndex(d => d.id === id);
+                db.depenses.splice(index, 1);
+                saveData();
+                updateDashboard();
+            }
+          }
+
+        // Fonction pour mettre à jour le tableau de bord
+        function updateDashboard() {
+            // Afficher les informations du propriétaire
+            if (db.proprietaire) {
+                document.getElementById('info-proprio').innerHTML = `
+                    <p><strong>Nom:</strong> ${db.proprietaire.nom} ${db.proprietaire.prenom}</p>
+                    <p><strong>Téléphone:</strong> ${db.proprietaire.telephone}</p>
+                `;
+            }
+            
+            // Récapitulatif
+            document.getElementById('nombre-chambres').textContent = db.chambres.length;
+            document.getElementById('nombre-locataires').textContent = db.locataires.length;
+            
+            const tauxOccupation = db.chambres.length > 0 
+                ? Math.round((db.chambres.filter(c => c.statut === 'occupée').length / db.chambres.length) * 100) 
+                : 0;
+            document.getElementById('taux-occupation').textContent = tauxOccupation + '%';
+            
+            // Filtrer par mois sélectionné
+            const moisSelectionne = document.getElementById('mois-dashboard').value;
+            
+            // Calculer les revenus du mois (paiements)
+            const paiementsMois = db.paiements.filter(p => p.mois === moisSelectionne);
+            const revenus = paiementsMois.reduce((sum, p) => sum + p.total, 0);
+            document.getElementById('revenus-mois').textContent = revenus.toFixed(2);
+            
+            // Calculer les dépenses du mois
+            const depensesMois = db.depenses.filter(d => {
+                const depenseDate = new Date(d.date);
+                const depenseMois = `${depenseDate.getFullYear()}-${String(depenseDate.getMonth() + 1).padStart(2, '0')}`;
+                return depenseMois === moisSelectionne;
+            });
+            
+            const depensesTotal = depensesMois.reduce((sum, d) => sum + d.montant, 0);
+            document.getElementById('depenses-mois').textContent = depensesTotal.toFixed(2);
+            
+            // Calculer la rentabilité
+            const rentabilite = revenus - depensesTotal;
+            const rentabiliteElem = document.getElementById('rentabilite-mois');
+            rentabiliteElem.textContent = rentabilite.toFixed(2);
+            if (rentabilite >= 0) {
+                rentabiliteElem.className = 'number profit';
+            } else {
+                rentabiliteElem.className = 'number loss';
+            }
+            
+            // Afficher la liste des dépenses du mois
+            const tbodyDepenses = document.querySelector('#table-depenses tbody');
+            tbodyDepenses.innerHTML = '';
+            
+            depensesMois.forEach(depense => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${formatDate(depense.date)}</td>
+                    <td>${depense.type}</td>
+                    <td>${depense.montant.toFixed(2)} FCFA</td>
+                    <td>${depense.description}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="supprimerDepense('${depense.id}')">Supprimer</button>
+                    </td>
+                `;
+                tbodyDepenses.appendChild(tr);
+            });
+            
+            // Afficher l'état des paiements du mois
+            const tbodyPaiements = document.querySelector('#table-paiements tbody');
+            tbodyPaiements.innerHTML = '';
+            
+            // Pour chaque locataire, vérifier s'il a payé pour le mois sélectionné
+            db.locataires.forEach(locataire => {
+                const chambre = db.chambres.find(c => c.id === locataire.chambreId);
+                if (!chambre) return;
+                
+                const paiement = paiementsMois.find(p => p.locataireId === locataire.id);
+                
+                const tr = document.createElement('tr');
+                if (paiement) {
+                    tr.innerHTML = `
+                        <td>${locataire.nom} ${locataire.prenom}</td>
+                        <td>${chambre.numero}</td>
+                        <td>${paiement.montantLoyer.toFixed(2)} FCFA</td>
+                        <td>${paiement.montantElectricite.toFixed(2)} FCFA</td>
+                        <td>${paiement.montantEau.toFixed(2)} FCFA</td>
+                        <td>${paiement.total.toFixed(2)} FCFA</td>
+                        <td><span class="badge bg-success">Payé</span></td>
+                    `;
+                } else {
+                    tr.innerHTML = `
+                        <td>${locataire.nom} ${locataire.prenom}</td>
+                        <td>${chambre.numero}</td>
+                        <td>${chambre.loyer} FCFA</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>${chambre.loyer} FCFA</td>
+                        <td><span class="badge bg-danger">Non payé</span></td>
+                    `;
+                }
+                tbodyPaiements.appendChild(tr);
+            });
+        }
+
+        // Fonction utilitaire pour formater les dates
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+        }
+
+        // Initialisation de l'application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            
+            // Initialiser le mois courant pour le dashboard
+            const today = new Date();
+            document.getElementById('mois-dashboard').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+        });
+
+        // Fonction pour réinitialiser toutes les données (pour le développement)
+        function resetData() {
+            if (confirm('Attention! Cela va effacer toutes vos données. Êtes-vous sûr?')) {
+                localStorage.removeItem('gainyData');
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
