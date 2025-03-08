@@ -1425,13 +1425,13 @@
                 const tr = document.createElement('tr');
                 if (paiement) {
                     tr.innerHTML = `
-                        <td>${locataire.nom} ${locataire.prenom}</td>
-                        <td>${chambre.numero}</td>
-                        <td>${paiement.montantLoyer.toFixed(2)} FCFA</td>
-                        <td>${paiement.montantElectricite.toFixed(2)} FCFA</td>
-                        <td>${paiement.montantEau.toFixed(2)} FCFA</td>
-                        <td>${paiement.total.toFixed(2)} FCFA</td>
-                        <td><span class="badge bg-success">Payé</span></td>
+                        <td data-label="Locataire">${locataire.nom} ${locataire.prenom}</td>
+                        <td data-label="Chambre">${chambre.numero}</td>
+                        <td data-label="Loyer">${paiement.montantLoyer.toFixed(2)} FCFA</td>
+                        <td data-label="Électricité">${paiement.montantElectricite.toFixed(2)} FCFA</td>
+                        <td data-label="Eau">${paiement.montantEau.toFixed(2)} FCFA</td>
+                        <td data-label="Total">${paiement.total.toFixed(2)} FCFA</td>
+                        <td data-label="Statut"><span class="badge bg-success">Payé</span></td>
                     `;
                 } else {
                     tr.innerHTML = `
