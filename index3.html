@@ -764,8 +764,7 @@
                                     <th>Téléphone</th>
                                     <th>Chambre</th>
                                     <th>Loyer</th>
-                                    <th>Actions <button class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i></button>
-                    <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button></th>
+                                    <th>Actions </th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -1207,7 +1206,7 @@
                         <td data-label="Nom">${locataire.nom}</td>
                         <td  data-label="Prénom">${locataire.prenom}</td>
                         <td  data-label="Téléphone">${locataire.telephone}</td>
-                        <td  data-label="Numéro">${chambre.numero}</td>
+                        <td  data-label="Chambre">${chambre.numero}</td>
                         <td  data-label="Loyer">${chambre.loyer} FCFA</td>
                         <td data-label="Actions">
                             <button class="btn btn-secondary btn-sm" onclick="enregistrerPaiement('${locataire.id}')"><i class="fas fa-edit"></i></button>
@@ -1405,7 +1404,7 @@
                     <td data-label="Montant">${depense.montant.toFixed(2)} FCFA</td>
                     <td data-label="Description ">${depense.description}</td>
                     <td data-label="Actions">
-                        <button class="btn btn-danger btn-sm" onclick="supprimerDepense('${depense.id}')"></button>
+                        <button class="btn btn-danger btn-sm" onclick="supprimerDepense('${depense.id}')"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
                 tbodyDepenses.appendChild(tr);
