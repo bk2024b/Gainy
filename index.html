@@ -1093,9 +1093,9 @@
             db.chambres.forEach(chambre => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${chambre.numero}</td>
-                    <td>${chambre.loyer} FCFA</td>
-                    <td>${chambre.statut}</td>
+                    <td data-label="Numéro">${chambre.numero}</td>
+                    <td data-label="Loyer">${chambre.loyer} FCFA</td>
+                    <td data-label="Statut">${chambre.statut}</td>
                     <td>
                         <button class="btn btn-danger btn-sm" onclick="supprimerChambre('${chambre.id}')">Supprimer</button>
                     </td>
